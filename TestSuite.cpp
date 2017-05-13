@@ -1,4 +1,7 @@
 #include "TestSuite.h"
+#include "Time.h"
+#include "Memory.h"
+#include <assert.h>
 
 unique_ptr<TestResults> TestSuite::RunTests() const
 {
@@ -45,14 +48,20 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 
 				TestResult result;
 
-				__int64 membegin = 0;
-				__int64 begin = 0;
+				Memory::ResetThreadTracking();
+				Memory::Report membegin = Memory::GetThreadReport();
+				__int64 begin = Time::GetCurrentTick();
+
 				result.CustomResult = pass.second(parameter.get());
-				__int64 end = 1;
-				__int64 memend = 0;
+
+				__int64 end = Time::GetCurrentTick();
+				Memory::Report memend = Memory::GetThreadReport();
+
+				assert(memend.TotalMemory == membegin.TotalMemory);
+				assert(memend.TotalAllocations == membegin.TotalAllocations);
 
 				result.Performance = end - begin;
-				result.MemoryUsage = memend - membegin;
+				result.MemoryUsage = memend.TrackingMax;
 
 				results.push_back(std::move(result));
 

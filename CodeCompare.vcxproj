@@ -145,13 +145,19 @@
   <ItemGroup>
     <ClCompile Include="ChartJSPrinter.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="TestHarness.cpp" />
     <ClCompile Include="TestSuite.cpp" />
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChartJSPrinter.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="PrintHelpers.h" />
+    <ClInclude Include="TestHarness.h" />
     <ClInclude Include="TestResults.h" />
     <ClInclude Include="TestSuite.h" />
+    <ClInclude Include="Time.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

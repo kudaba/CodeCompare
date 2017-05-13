@@ -2,8 +2,10 @@
 
 struct TestResults;
 
+//----------------------------------------------------------------------------------------
 // Print the results to a webpage that uses Chart.js as a renderer
 // http://www.chartjs.org
+//----------------------------------------------------------------------------------------
 class ChartJSPrinter
 {
 public:

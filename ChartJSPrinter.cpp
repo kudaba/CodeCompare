@@ -206,9 +206,9 @@ private:
 
 		int value32 = (value ^ (value >> 32)) & 0xffffffff;
 
-		int r = (value >> 24) & 0xff;
-		int g = (value >> 16) & 0xff;
-		int b = (value >> 8) & 0xff;
+		int r = (value32 >> 0) & 0xff;
+		int g = (value32 >> 16) & 0xff;
+		int b = (value32 >> 8) & 0xff;
 
 		char out[32];
 		sprintf_s(out, "rgba(%d,%d,%d,1)", r, g, b);
@@ -222,17 +222,17 @@ private:
 		file << "\ttest: \"" << title << ": " << chart << "\"," << endl;
 		file << "\tid: \"" << title << chart << "\"," << endl;
 		file << "\tparameters: parameters," << endl;
-		file << "\tpasses: [";
+		file << "\tpasses: [" << endl;
 
 		PrintList(pass, file, [&](auto const& itr) {
-			file << endl << "\t\t{" << endl;
+			file << "\t\t{" << endl;
 			file << "\t\t\tname: \"" << itr.first.c_str() << "\"," << endl;
 			file << "\t\t\tresults: [";
 			PrintList(itr.second, file, [&](auto const& r) { file << to_string(result(r)).c_str(); });
 			file << "]," << endl;
-			file << "\t\t\tname: \"" << ColorString(itr.first.c_str()).c_str() << "\"" << endl;
+			file << "\t\t\tcolor: \"" << ColorString(itr.first.c_str()).c_str() << "\"" << endl;
 			file << "\t\t}";
-		});
+		}, ",\n");
 
 		file << endl << "\t]" << endl;
 		file << "});" << endl;

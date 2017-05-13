@@ -1,7 +1,12 @@
-#include "TestSuite.h"
-#include "ChartJSPrinter.h"
 #include "PrintHelpers.h"
+#include "Memory.h"
+#include "Assert.h"
+#include "Time.h"
+#include "TestHarness.h"
 
+//----------------------------------------------------------------------------------------
+// Helper to print pass results
+//----------------------------------------------------------------------------------------
 void PrintPass(const char* name, TestResults::PassResults const& pass)
 {
 	cout << name << endl;
@@ -11,53 +16,58 @@ void PrintPass(const char* name, TestResults::PassResults const& pass)
 		cout << test.first << endl;
 
 		cout << "Perf: ";
-		PrintJoin(test.second, cout, [](auto& item) { return item.Performance; });
+		PrintList(test.second, cout, [&](auto& item) { cout << item.Performance; });
 		cout << endl;
 
 		cout << "Mem: ";
-		PrintJoin(test.second, cout, [](auto& item) { return item.MemoryUsage; });
+		PrintList(test.second, cout, [&](auto& item) { cout << item.MemoryUsage; });
 		cout << endl;
 
 		cout << "Custom: ";
-		PrintJoin(test.second, cout, [](auto& item) { return item.CustomResult; });
+		PrintList(test.second, cout, [&](auto& item) { cout << item.CustomResult; });
 		cout << endl;
 	}
 	cout << endl;
 }
 
-void main()
+//----------------------------------------------------------------------------------------
+// Run tests and optionally print results to console
+//----------------------------------------------------------------------------------------
+void executeTests(bool verbose)
 {
-	TestSuite suite("Test Suite");
-	suite.AddTestParameter(1, 10, 100, 10000, 1000000);
-	suite.SetPassWeights("pass2", TestWeight(1,1,0.1f));
+	auto suite = TestHarness::CreateTest();
+	auto results = suite->RunTests();
 
-	unique_ptr<CodeTest> test1(new CodeTest("test1"));
-	test1->SetPass("pass1", [](Parameter const* param) { return ((IntParameter const*)param)->GetValue() * 50; });
-	test1->SetPass("pass2", [](Parameter const* param) { return ((IntParameter const*)param)->GetValue() * 100; });
-	suite.AddTest(move(test1));
-
-	unique_ptr<CodeTest> test2(new CodeTest("test2"));
-	test2->SetPass("pass1", [](Parameter const* param) { return ((IntParameter const*)param)->GetValue() * 100; });
-	test2->SetPass("pass3", [](Parameter const* param) { return ((IntParameter const*)param)->GetValue() * 200; });
-	suite.AddTest(move(test2));
-
-	auto results = suite.RunTests();
-
-	cout << endl << endl;
-
-	for (auto const& pass : results->Passes)
+	if (verbose)
 	{
-		PrintPass(pass.first.c_str(), pass.second);
+		cout << endl << endl;
+
+		for (auto const& pass : results->Passes)
+		{
+			PrintPass(pass.first.c_str(), pass.second);
+		}
+
+		PrintPass("Summary", results->Summary);
 	}
 
-	PrintPass("Summary", results->Summary);
+	TestHarness::PrintTest(*results);
+}
 
-	ChartJSPrinter printer;
-	printer.PrintResults(*results);
+//----------------------------------------------------------------------------------------
+// Setup conditions for memory leak detection and overall performance test
+//----------------------------------------------------------------------------------------
+void main()
+{
+	assert(Memory::GetGlobalReport().TotalMemory == 0);
+	auto begin = Time::GetCurrentTick();
+	executeTests(true);
+	auto end = Time::GetCurrentTick();
 
+	auto report = Memory::GetGlobalReport();
+	assert(report.TotalMemory == 0);
 
-	printer.CSSStyle = ChartJSPrinter::CSSStyleType::Inline;
-	printer.ScriptStyle = ChartJSPrinter::ScriptStyleType::Internal;
-	printer.HTMLFile = "results2.html";
-	printer.PrintResults(*results);
+	cout << endl;
+	cout << "Maximum Memory Used: " << report.TrackingMax << endl;
+	cout << "Total Allocations: " << report.TotalAllocations << endl;
+	cout << "Total Execution time: " << Time::AutoPrintTime(end - begin).c_str() << endl;
 }
