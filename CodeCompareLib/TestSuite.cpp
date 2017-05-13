@@ -36,7 +36,7 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 			if (itr != PassWeights.end())
 				weight = itr->second;
 
-			for (int i = 0; i < numParams; ++i)
+			for (size_t i = 0; i < numParams; ++i)
 			{
 				auto const& parameter = Parameters[i];
 
@@ -73,7 +73,7 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 			cout << endl;
 		}
 
-		for (int i = 0; i < numParams; ++i)
+		for (size_t i = 0; i < numParams; ++i)
 		{
 			summary[i].Performance /= test->GetPasses().size();
 			summary[i].MemoryUsage /= test->GetPasses().size();

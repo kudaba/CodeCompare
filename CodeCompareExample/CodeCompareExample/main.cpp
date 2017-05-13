@@ -1,9 +1,9 @@
-#include "TestHarness.h"
+#include "Bootstrap.h"
 #include "ChartJSPrinter.h"
 
-namespace TestHarness
+class ExampleHarness : public TestHarness
 {
-	unique_ptr<TestSuite const> TestHarness::CreateTest()
+	unique_ptr<TestSuite const> TestHarness::CreateTest() const override
 	{
 		TestSuite* suite = new TestSuite("Test Suite");
 		suite->AddTestParameter(1, 10, 100, 10000, 1000000);
@@ -22,9 +22,14 @@ namespace TestHarness
 		return unique_ptr<TestSuite const>(suite);
 	}
 
-	void TestHarness::PrintTest(TestResults const& results)
+	void PrintTest(TestResults const& results) const override
 	{
 		ChartJSPrinter printer;
 		printer.PrintResults(results);
 	}
+};
+
+void main()
+{
+	Bootstrap::RunTests(ExampleHarness());
 }

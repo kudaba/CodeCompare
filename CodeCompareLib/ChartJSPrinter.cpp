@@ -104,7 +104,7 @@ private:
 		auto length = scriptSourceFile.tellg();
 		scriptSourceFile.seekg(0, scriptSourceFile.beg);
 
-		char* data = new char[length.seekpos()];
+		char* data = new char[(size_t)length.seekpos()];
 		scriptSourceFile.read(data, length);
 		file.write(data, scriptSourceFile.gcount());
 		file << endl;
@@ -134,7 +134,6 @@ private:
 	void PrintChartDivs(fstream& file, TestResults::PassResults const& pass, const char* title) const
 	{
 		file << "\t<div>" << endl;
-
 		PrintChartDiv(file, pass, title, "Results");
 		if (IncludePerformance)
 		{
@@ -204,7 +203,7 @@ private:
 	{
 		size_t value = hash<string>()(text);
 
-		int value32 = (value ^ (value >> 32)) & 0xffffffff;
+		int value32 = (value ^ (value >> sizeof(value)*4)) & 0xffffffff;
 
 		int r = (value32 >> 0) & 0xff;
 		int g = (value32 >> 16) & 0xff;

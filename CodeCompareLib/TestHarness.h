@@ -8,8 +8,13 @@
 //
 // Once the test is finished running it will be given back to print out however you like.
 //----------------------------------------------------------------------------------------
-namespace TestHarness
+class TestHarness
 {
-	unique_ptr<TestSuite const> CreateTest();
-	void PrintTest(TestResults const& results);
+public:
+	TestHarness() : Verbose(false) {}
+
+	virtual unique_ptr<TestSuite const> CreateTest() const = 0;
+	virtual void PrintTest(TestResults const& results) const = 0;
+
+	bool Verbose;
 };
