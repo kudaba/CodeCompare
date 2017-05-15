@@ -20,7 +20,9 @@ A Code Test is a simple objects that is used to bind different code samples into
 # Invoke a Printer
 The second part of implementing a test is figuring out how to print it. You can enable verbose printing to get some info on the command line but the main idea is to use one of the build in printers, or write your own, to convert the data into something presentable, or maybe even upload to elastic search or anything you want. It's basically just processing the results of the test suite.
 
-# Example:
+# Examples:
+
+## Code
 Here's a very basic example showing the major parts of the system:
 ```c++
 #include "Bootstrap.h"
@@ -59,3 +61,8 @@ void main()
 	Bootstrap::RunTests(ExampleHarness());
 }
 ```
+
+## Results
+Here's an example of the outputs from a real world scenario:
+
+[Hash Comparion Results](http://htmlpreview.github.io/?https://github.com/kudaba/CodeCompare/blob/HashTest/HashResults.html)
