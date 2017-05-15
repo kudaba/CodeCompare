@@ -68,6 +68,10 @@ namespace Bootstrap
 		assert(report.TotalMemory == 0);
 
 		cout << endl;
+
+		if (report.TotalMemory > 0)
+			cout << "Leaked Memory: " << report.TotalMemory << endl;
+
 		cout << "Maximum Memory Used: " << report.TrackingMax << endl;
 		cout << "Total Allocations: " << report.TotalAllocations << endl;
 		cout << "Total Execution time: " << Time::AutoPrintTime(end - begin).c_str() << endl;
