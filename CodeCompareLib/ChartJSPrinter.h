@@ -17,9 +17,6 @@ public:
 		, ScriptFile(nullptr)
 		, HTMLFile("results.html")
 		, IncludeD3(true)
-		, IncludePerformance(true)
-		, IncludeMemory(true)
-		, PrintSummary(true)
 		, ChartWidth(500)
 		, ChartHeight(200)
 		, SpacingX(50)
@@ -52,10 +49,6 @@ public:
 	const char* HTMLFile;
 
 	bool IncludeD3;
-	bool IncludePerformance;
-	bool IncludeMemory;
-
-	bool PrintSummary;
 
 	int ChartWidth;
 	int ChartHeight;

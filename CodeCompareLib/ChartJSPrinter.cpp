@@ -120,10 +120,7 @@ private:
 
 	void PrintChartDivs(fstream& file, TestResults const& results) const
 	{
-		if (PrintSummary)
-		{
-			PrintChartDivs(file, results.Summary, "Summary");
-		}
+		PrintChartDivs(file, results.Summary, "Summary");
 
 		for (auto const& pass : results.Passes)
 		{
@@ -133,21 +130,21 @@ private:
 
 	void PrintChartDivs(fstream& file, TestResults::PassResults const& pass, const char* title) const
 	{
+		if (!pass.Config.Any([](auto const& e) {return e.Enabled; }))
+			return;
+
 		file << "\t<div>" << endl;
-		PrintChartDiv(file, pass, title, "Results");
-		if (IncludePerformance)
+
+		for (int i = 0; i < TestConfig::Count; ++i)
 		{
-			PrintChartDiv(file, pass, title, "Performance");
-		}
-		if (IncludeMemory)
-		{
-			PrintChartDiv(file, pass, title, "Memory");
+			if (pass.Config[i].Enabled)
+				PrintChartDiv(file, title, TestConfig::Name(i));
 		}
 
 		file << "\t</div>" << endl;
 	}
 
-	void PrintChartDiv(fstream& file, TestResults::PassResults const& pass, const char* title, const char* chart) const
+	void PrintChartDiv(fstream& file, const char* title, const char* chart) const
 	{
 		if (CSSStyle == CSSStyleType::Inline)
 		{
@@ -160,7 +157,7 @@ private:
 			file << "\t\t<div class=\"chart\">" << endl;
 		}
 
-		file << "\t\t\t<canvas id=\"" << title << chart << "\"></canvas>" << endl;
+		file << "\t\t\t<canvas id=\"" << title << chart << "\" width=\"100\" height=\"100\"></canvas>" << endl;
 		file << "\t\t</div>" << endl;
 	}
 
@@ -170,13 +167,10 @@ private:
 		file << "<script>" << endl;
 
 		file << "parameters = [";
-		PrintList(results.Parameters, file, [&](auto const& e) { file << e.c_str(); });
+		PrintList(results.Parameters, file, [&](auto const& e) { file << "\"" << e.c_str() << "\""; });
 		file << "];" << endl;
 
-		if (PrintSummary)
-		{
-			PrintChartScripts(file, results.Summary, "Summary");
-		}
+		PrintChartScripts(file, results.Summary, "Summary");
 
 		for (auto const& pass : results.Passes)
 		{
@@ -188,14 +182,13 @@ private:
 
 	void PrintChartScripts(fstream& file, TestResults::PassResults const& pass, const char* title) const
 	{
-		PrintChartScript(file, pass, title, "Results", [](auto p) { return p.CustomResult; });
-		if (IncludePerformance)
+		if (!pass.Config.Any([](auto const& e) {return e.Enabled; }))
+			return;
+
+		for (unsigned i = 0; i < TestConfig::Count; ++i)
 		{
-			PrintChartScript(file, pass, title, "Performance", [](auto p) { return p.Performance; });
-		}
-		if (IncludeMemory)
-		{
-			PrintChartScript(file, pass, title, "Memory", [](auto p) { return p.MemoryUsage; });
+			if (pass.Config[i].Enabled)
+				PrintChartScript(file, pass, title, i);
 		}
 	}
 
@@ -214,27 +207,95 @@ private:
 		return out;
 	}
 
-	void PrintChartScript(fstream& file, TestResults::PassResults const& pass, const char* title, const char* chart, function<__int64(TestResult)> result) const
+	void PrintChartScript(fstream& file, TestResults::PassResults const& pass, const char* title, unsigned index) const
 	{
+		const char* chartName = TestConfig::Name(index);
+
+		const char* parameters = "parameters";
+		if (pass.Config[index].ShowSum || pass.Config[index].ShowAverage)
+		{
+			parameters = "params";
+			file << "var params = parameters.slice(0);" << endl;
+			if (pass.Config[index].ShowSum)
+			{
+				file << "params.push(\"Totals\");" << endl;
+			}
+			if (pass.Config[index].ShowAverage)
+			{
+				file << "params.push(\"Average\");" << endl;
+			}
+		}
+
 		file << "CreateChart({" << endl;
 
-		file << "\ttest: \"" << title << ": " << chart << "\"," << endl;
-		file << "\tid: \"" << title << chart << "\"," << endl;
-		file << "\tparameters: parameters," << endl;
+		file << "\ttest: \"" << title << ": " << chartName << "\"," << endl;
+		file << "\tid: \"" << title << chartName << "\"," << endl;
+		file << "\tparameters: " << parameters << "," << endl;
 		file << "\tpasses: [" << endl;
 
-		PrintList(pass, file, [&](auto const& itr) {
-			file << "\t\t{" << endl;
-			file << "\t\t\tname: \"" << itr.first.c_str() << "\"," << endl;
-			file << "\t\t\tresults: [";
-			PrintList(itr.second, file, [&](auto const& r) { file << to_string(result(r)).c_str(); });
-			file << "]," << endl;
-			file << "\t\t\tcolor: \"" << ColorString(itr.first.c_str()).c_str() << "\"" << endl;
-			file << "\t\t}";
-		}, ",\n");
+		function<void(vector<TestResult> const&)> resultPrinter = [&](auto const& results) {
+			PrintList(results, file, [&](auto const& r) { file << to_string(r[index]).c_str(); }); };
+
+		const char* nl = ",\n";
+
+		PrintList(pass.Results, file, [&](auto const& itr) {
+			PrintPassResults(file, itr.first.c_str(), itr.second.Results, pass, index);
+		}, nl);
 
 		file << endl << "\t]" << endl;
 		file << "});" << endl;
+	}
+
+	void PrintPassResults(fstream& file, const char* name, vector<TestResult> const& results, TestResults::PassResults const& pass, unsigned index) const
+	{
+		file << "\t\t{" << endl;
+		file << "\t\t\tname: \"" << name << "\"," << endl;
+		file << "\t\t\tresults: [";
+
+		PrintResults(file, results, pass, index);
+
+		file << "]," << endl;
+		file << "\t\t\tcolor: \"" << ColorString(name).c_str() << "\"" << endl;
+		file << "\t\t}";
+	}
+
+	void PrintResults(fstream& file, vector<TestResult> const& results, TestResults::PassResults const& pass, unsigned index) const
+	{
+		auto sort = pass.Config[index].Sort;
+		switch (sort)
+		{
+		case PassConfig::RelativeValue1Min:
+		case PassConfig::RelativeValue1Max:
+		{
+			int paramIdx = 0;
+			float sum = 0;
+			PrintList(results, file, [&](auto const& r)
+			{
+				__int64 div = sort == PassConfig::RelativeValue1Min ? pass.Min[paramIdx][index] : pass.Max[paramIdx][index];
+
+				float val = div == 0 ? 1.0f : float(double(r[index]) / double(div));
+				sum += val;
+				file << val;
+
+				++paramIdx;
+			});
+
+			if (pass.Config[index].ShowSum)
+				file << ", " << sum;
+			if (pass.Config[index].ShowAverage)
+				file << ", " << sum / float(results.size());
+		}
+		break;
+		default:
+			__int64 sum = 0;
+
+			PrintList(results, file, [&](auto const& r) { sum += r[index]; file << r[index]; });
+			if (pass.Config[index].ShowSum)
+				file << ", " << sum;
+			if (pass.Config[index].ShowAverage)
+				file << ", " << sum / results.size();
+			break;
+		}
 	}
 };
 

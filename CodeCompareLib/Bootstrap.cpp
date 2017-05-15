@@ -1,6 +1,5 @@
 #include "PrintHelpers.h"
 #include "Memory.h"
-#include "Assert.h"
 #include "Time.h"
 #include "TestHarness.h"
 
@@ -13,20 +12,20 @@ namespace Bootstrap
 	{
 		cout << name << endl;
 
-		for (auto const& test : pass)
+		for (auto const& test : pass.Results)
 		{
 			cout << test.first << endl;
 
 			cout << "Perf: ";
-			PrintList(test.second, cout, [&](auto& item) { cout << item.Performance; });
+			PrintList(test.second.Results, cout, [&](auto& item) { cout << item.Performance; });
 			cout << endl;
 
 			cout << "Mem: ";
-			PrintList(test.second, cout, [&](auto& item) { cout << item.MemoryUsage; });
+			PrintList(test.second.Results, cout, [&](auto& item) { cout << item.MemoryUsage; });
 			cout << endl;
 
 			cout << "Custom: ";
-			PrintList(test.second, cout, [&](auto& item) { cout << item.CustomResult; });
+			PrintList(test.second.Results, cout, [&](auto& item) { cout << item.CustomResult; });
 			cout << endl;
 		}
 		cout << endl;

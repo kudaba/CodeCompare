@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <assert.h>
 
 using namespace std;
 
@@ -11,31 +12,110 @@ using namespace std;
 // Performance (nanoseconds) and Memory consumtion are standard.
 // Memory collection requires that standard new / delete are used and no allocators are used.
 // Each pass can also return a custom piece of data to be compared.
+//
+// Really this is just a glorified vector3... add helper methods as necessary
 //----------------------------------------------------------------------------------------
 template <typename T, int Default = 0>
 struct TestInfo
 {
+	enum
+	{
+		Count = 3
+	};
+
 	TestInfo()
-		: Performance(Default)
-		, MemoryUsage(Default)
-		, CustomResult(Default)
+		: CustomResult((T)Default)
+		, Performance((T)Default)
+		, MemoryUsage((T)Default)
 	{
 	}
 
-	TestInfo(T perf, T mem, T cust)
-		: Performance(perf)
+	TestInfo(T init)
+		: CustomResult(init)
+		, Performance(init)
+		, MemoryUsage(init)
+	{
+	}
+
+	TestInfo(T cust, T perf, T mem)
+		: CustomResult(cust)
+		, Performance(perf)
 		, MemoryUsage(mem)
-		, CustomResult(cust)
 	{
 	}
 
+	TestInfo& operator|=(TestInfo const& other)
+	{
+		CustomResult = (T)((int)CustomResult | (int)other.CustomResult);
+		Performance = (T)((int)Performance | (int)other.Performance);
+		MemoryUsage = (T)((int)MemoryUsage | (int)other.MemoryUsage);
+		return *this;
+	}
+
+	template <typename Func>
+	bool Any(Func func) const
+	{
+		return func(CustomResult) || func(Performance) || func(MemoryUsage);
+	}
+
+	T& operator[](unsigned i) { assert(i < Count); return ((T*)this)[i]; }
+	T* begin() { return (T*)this; }
+	T* end() { return ((T*)this) + Count; }
+
+	T const& operator[](unsigned i) const { assert(i < Count); return ((T const*)this)[i]; }
+	T const* begin() const { return (T const*)this; }
+	T const* end() const { return ((T const*)this) + Count; }
+
+	static const char* Name(unsigned i)
+	{
+		const char* names[] =
+		{
+			"Result",
+			"Performance",
+			"Memory",
+		};
+		return names[i];
+	}
+
+	T CustomResult; // user value
 	T Performance; // nano seconds
 	T MemoryUsage; // bytes
-	T CustomResult; // user value
+};
+
+struct PassConfig
+{
+	enum Sorting
+	{
+		None,
+		RelativeValue1Max,		// Show value relative to maximum value
+		RelativeValue1Min,		// Show value relative to minimum value
+		Ranked,					// Show by rank (lowest = 1, next is 2, etc)
+	};
+
+
+	PassConfig(int init)
+		: Enabled(!!init)
+		, ShowSum(false)
+		, ShowAverage(false)
+		, Sort(None)
+		, Reverse(false)
+	{
+
+	}
+
+	bool Enabled;				// enable this pass at all
+
+	// Extra paramters
+	bool ShowSum;				// Show a sum of all parameters used
+	bool ShowAverage;			// Show the average all parameters used
+
+	Sorting Sort;
+	bool Reverse;
 };
 
 typedef TestInfo<__int64> TestResult;
 typedef TestInfo<float, 1> TestWeight;
+typedef TestInfo<PassConfig> TestConfig;
 
 //----------------------------------------------------------------------------------------
 // Collected results of tests
@@ -46,7 +126,20 @@ typedef TestInfo<float, 1> TestWeight;
 //----------------------------------------------------------------------------------------
 struct TestResults
 {
-	typedef map<string, vector<TestResult>> PassResults;
+	struct PassResult
+	{
+		vector<TestResult> Results;
+	};
+
+	struct PassResults
+	{
+		map<string, PassResult> Results;
+		TestConfig Config;
+
+		vector<TestResult> Min;
+		vector<TestResult> Max;
+	};
+
 	map<string, PassResults> Passes;
 
 	PassResults Summary;

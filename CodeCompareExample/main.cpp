@@ -6,7 +6,7 @@ class ExampleHarness : public TestHarness
 	unique_ptr<TestSuite const> TestHarness::CreateTest() const override
 	{
 		TestSuite* suite = new TestSuite("Test Suite");
-		suite->AddTestParameter(1, 10, 100, 10000, 1000000);
+		suite->AddAutoParameter(1, 10, 100, 10000, 1000000);
 		suite->SetPassWeights("pass2", TestWeight(1, 1, 0.1f));
 
 		unique_ptr<CodeTest> test1(new CodeTest("test1"));

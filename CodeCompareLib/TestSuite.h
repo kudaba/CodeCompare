@@ -98,16 +98,21 @@ public:
 	}
 
 	template <typename ParamType>
-	void AddTestParameter(ParamType param)
+	void AddAutoParameter(ParamType param)
 	{
 		Parameters.push_back(MakeParameter(param));
 	}
 
 	template <typename ParamType, typename... ParamTypes>
-	void AddTestParameter(ParamType param, ParamTypes... params)
+	void AddAutoParameter(ParamType param, ParamTypes... params)
 	{
 		Parameters.push_back(MakeParameter(param));
-		AddTestParameter(params...);
+		AddAutoParameter(params...);
+	}
+
+	void AddTestParameter(unique_ptr<Parameter const> param)
+	{
+		Parameters.push_back(move(param));
 	}
 
 	void AddTest(unique_ptr<CodeTest const> test)
@@ -120,10 +125,22 @@ public:
 		PassWeights[pass] = weight;
 	}
 
+	void SetPassConfig(const char* pass, TestConfig config)
+	{
+		PassConfigs[pass] = config;
+	}
+
+	void SetSummaryConfig(TestConfig config)
+	{
+		SummaryConfig = config;
+	}
+
 	unique_ptr<TestResults> RunTests() const;
 
 private:
 	vector<unique_ptr<CodeTest const>> Tests;
 	vector<unique_ptr<Parameter const>> Parameters;
 	map<string, TestWeight> PassWeights;
+	map<string, TestConfig> PassConfigs;
+	TestConfig SummaryConfig;
 };
