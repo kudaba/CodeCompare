@@ -184,6 +184,9 @@ class ExampleHarness : public TestHarness
 	void PrintTest(TestResults const& results) const override
 	{
 		ChartJSPrinter printer;
+		printer.HTMLFile = "HashResults.html";
+		printer.CSSStyle = ChartJSPrinter::CSSStyleType::Inline;
+		printer.ScriptStyle = ChartJSPrinter::ScriptStyleType::Internal;
 		printer.PrintResults(results);
 	}
 };
