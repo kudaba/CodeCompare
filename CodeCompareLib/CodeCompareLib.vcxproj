@@ -185,7 +185,6 @@
     <None Include="ChartJSWrapper.js">
       <DeploymentContent>false</DeploymentContent>
     </None>
-    <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChartJSPrinter.cpp" />

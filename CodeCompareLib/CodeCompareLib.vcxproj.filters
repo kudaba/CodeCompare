@@ -16,7 +16,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Readme.md" />
     <None Include="ChartJSWrapper.js">
       <Filter>Printers</Filter>
     </None>
