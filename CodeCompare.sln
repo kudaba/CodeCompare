@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CodeCompareExample", "CodeCompareExample\CodeCompareExample.vcxproj", "{30CD466A-60B0-44E9-9A69-175D99F70485}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CodeCompareLib", "CodeCompareLib\CodeCompareLib.vcxproj", "{95761F39-1A18-48FA-A629-C77EC945E20E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{95761F39-1A18-48FA-A629-C77EC945E20E} = {95761F39-1A18-48FA-A629-C77EC945E20E}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

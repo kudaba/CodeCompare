@@ -2,5 +2,41 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="HashFunctions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="bible.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dic_common_words.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dic_longwords.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dic_numbers.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dic_postfix.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dic_prefix.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dic_win32.txt">
+      <Filter>HashData</Filter>
+    </Text>
+    <Text Include="dictionary.txt">
+      <Filter>HashData</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HashFunctions.h" />
+    <ClInclude Include="hashmacro3.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="HashData">
+      <UniqueIdentifier>{16f543d4-2abf-4e04-b281-adde990bea1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
