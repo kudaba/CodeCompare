@@ -115,7 +115,7 @@ struct PassConfig
 
 typedef TestInfo<__int64> TestResult;
 typedef TestInfo<float, 1> TestWeight;
-typedef TestInfo<PassConfig> TestConfig;
+typedef TestInfo<PassConfig, 1> TestConfig;
 
 //----------------------------------------------------------------------------------------
 // Collected results of tests
