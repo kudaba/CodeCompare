@@ -1,9 +1,15 @@
 #include "HashFunctions.h"
 
 #include "hashmacro3.h"
+#include "xxhash.h"
 
 namespace Hashes
 {
+    unsigned xxHash(const char *key, size_t len)
+    {
+        return XXH32(key, len, 0);
+    }
+
 	// Original source from
 	// (c) Peter Kankowski, 2008. http://smallcode.weblogs.us
 	// Hash functions benchmark

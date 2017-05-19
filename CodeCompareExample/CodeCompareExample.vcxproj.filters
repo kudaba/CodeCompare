@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="HashFunctions.cpp" />
+    <ClCompile Include="xxhash.c" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="bible.txt">
@@ -33,6 +34,7 @@
   <ItemGroup>
     <ClInclude Include="HashFunctions.h" />
     <ClInclude Include="hashmacro3.h" />
+    <ClInclude Include="xxhash.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="HashData">

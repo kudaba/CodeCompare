@@ -8,12 +8,12 @@
 namespace Hashes
 {
 	typedef unsigned(*HashFunction)(const char*, size_t);
-	static const HashFunction Functions[] = { Bernstein, KernighanRitchie, Hash17,
-		Hash65599, FNV1a, Weinberger, PaulHsieh, OneAtTime, ArashPartow,
-		ConstHash };
-	static const char* Names[] = { "Bernstein", "Kernighan&Ritchie", "x17",
-		"x65599", "FNV-1a", "Weinberger", "Paul Hsieh", "One At Time", "Arash Partow",
-		"Const Hash (mine)" };
+	static const HashFunction Functions[] = { 
+		Hash65599, FNV1a, PaulHsieh,
+		ConstHash, xxHash };
+	static const char* Names[] = { 
+		"x65599", "FNV-1a", "Paul Hsieh",
+		"Const Hash (mine)", "xxHash" };
 
 	const unsigned Count = sizeof(Functions) / sizeof(Functions[0]);
 	const unsigned MaxLength = 64; // Const Hash caps at this so to keep the comparison fair ish
@@ -81,7 +81,7 @@ public:
 			{
 				index = (index + 1) & sizemask;
 				++collision;
-				if (table[index].Hash == hash)
+				if (table[index].Hash == hash && strcmp(table[index].Key, line.c_str()) != 0)
 					++truecollision;
 			}
 
@@ -157,7 +157,7 @@ class ExampleHarness : public TestHarness
 		TestConfig config(0);
 		config.CustomResult.Enabled = true;
 		config.CustomResult.ShowAverage = true;
-		config.CustomResult.Sort = PassConfig::Ranked;
+		config.CustomResult.Sort = PassConfig::None;
 
 		TestConfig perfConfig(0);
 		perfConfig.Performance.Enabled = true;
@@ -165,7 +165,8 @@ class ExampleHarness : public TestHarness
 		perfConfig.Performance.Sort = PassConfig::RelativeValue1Max;
 
 		suite->SetPassConfig("Collisions", config);
-		suite->SetPassConfig("True Collisions", config);
+        config.CustomResult.Sort = PassConfig::Ranked;
+        suite->SetPassConfig("True Collisions", config);
 		suite->SetPassConfig("Performance", perfConfig);
 
 		for (int i = 0; i < Hashes::Count; ++i)
@@ -186,7 +187,7 @@ class ExampleHarness : public TestHarness
 		ChartJSPrinter printer;
 		printer.HTMLFile = "HashResults.html";
 		printer.CSSStyle = ChartJSPrinter::CSSStyleType::Inline;
-		printer.ScriptStyle = ChartJSPrinter::ScriptStyleType::Internal;
+		//printer.ScriptStyle = ChartJSPrinter::ScriptStyleType::Internal;
 		printer.PrintResults(results);
 	}
 };
