@@ -57,4 +57,5 @@ public:
 	int SpacingY;
 
 	void PrintResults(TestResults const& results) const;
+    void Open() const;
 };

@@ -304,3 +304,8 @@ void ChartJSPrinter::PrintResults(TestResults const& results) const
 	auto internal = (ChartJSPrinterInternal const*)this;
 	internal->PrintResultsInternal(results);
 }
+
+void ChartJSPrinter::Open() const
+{
+    system(HTMLFile);
+}
