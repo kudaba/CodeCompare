@@ -15,10 +15,16 @@ int roundnaive(float aFloat) {
     return aFloat >= 0.0f ? int(aFloat + 0.5f) : int(aFloat - 0.5f);
 }
 
-int rountopt(float aFloat)
+int roundsignbit(float aFloat)
 {
-    bool pos = aFloat >= 0.0f;
-    return int(aFloat + 0.5f) * pos + int(aFloat - 0.5f) * !pos;
+    bool neg = signbit(aFloat);
+    return int(aFloat + 0.5f) * !neg + int(aFloat - 0.5f) * neg;
+}
+
+int roundopt(float aFloat)
+{
+    bool neg = aFloat < 0;
+    return int(aFloat + 0.5f) * !neg + int(aFloat - 0.5f) * neg;
 }
 
 int roundsign(float aFloat)
@@ -30,7 +36,26 @@ extern float* tests;
 
 class ExampleHarness : public TestHarness
 {
-	unique_ptr<TestSuite const> TestHarness::CreateTest() const override
+#define CreateFunctor(f, mod) { \
+    int result = 0; \
+    for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i) { \
+        result += f(data[0] + mod); \
+        result += f(data[1] + mod); \
+        result += f(data[2] + mod); \
+    } \
+    return result; \
+}
+
+    #define CreatePass(name, f) { \
+        float* data = tests; \
+        CodeTest* test = new CodeTest(name); \
+        test->SetPass("Performance All", [data](Parameter const* param) CreateFunctor(f, 0.001f)); \
+        test->SetPass("Performance Neg", [data](Parameter const* param) CreateFunctor(f, -1)); \
+        test->SetPass("Performance Pos", [data](Parameter const* param) CreateFunctor(f, 1)); \
+        suite->AddTest(unique_ptr<CodeTest const>(test)); \
+    }
+    
+    unique_ptr<TestSuite const> TestHarness::CreateTest() const override
 	{
 		TestSuite* suite = new TestSuite("Test Suite");
 		suite->AddAutoParameter(1000000, 10000000, 50000000, 100000000);
@@ -44,123 +69,10 @@ class ExampleHarness : public TestHarness
         suite->SetPassConfig("Performance Neg", config);
         suite->SetPassConfig("Performance Pos", config);
 
-        float* data = tests;
-
-        {
-            unique_ptr<CodeTest> test(new CodeTest("roundnaive"));
-            test->SetPass("Performance All", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += roundnaive(data[0] + 0.001f);
-                    result += roundnaive(data[1] + 0.001f);
-                    result += roundnaive(data[2] + 0.001f);
-                }
-                return result;
-            });
-            test->SetPass("Performance Neg", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += roundnaive(data[0] - 1);
-                    result += roundnaive(data[0] - 1);
-                    result += roundnaive(data[0] - 1);
-                }
-                return result;
-            });
-            test->SetPass("Performance Pos", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += roundnaive(data[2] + 1);
-                    result += roundnaive(data[2] + 1);
-                    result += roundnaive(data[2] + 1);
-                }
-                return result;
-            });
-            suite->AddTest(move(test));
-        }
-
-        {
-            unique_ptr<CodeTest> test(new CodeTest("rountopt"));
-            test->SetPass("Performance All", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += rountopt(data[0] + 0.001f);
-                    result += rountopt(data[1] + 0.001f);
-                    result += rountopt(data[2] + 0.001f);
-                }
-                return result;
-            });
-            test->SetPass("Performance Neg", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += rountopt(data[0] - 1);
-                    result += rountopt(data[0] - 1);
-                    result += rountopt(data[0] - 1);
-                }
-                return result;
-            });
-            test->SetPass("Performance Pos", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += rountopt(data[2] + 1);
-                    result += rountopt(data[2] + 1);
-                    result += rountopt(data[2] + 1);
-                }
-                return result;
-            });
-            suite->AddTest(move(test));
-        }
-
-
-
-        {
-            unique_ptr<CodeTest> test(new CodeTest("roundsign"));
-            test->SetPass("Performance All", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += roundsign(data[0] + 0.001f);
-                    result += roundsign(data[1] + 0.001f);
-                    result += roundsign(data[2] + 0.001f);
-                }
-                return result;
-            });
-            test->SetPass("Performance Neg", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += roundsign(data[0] - 1);
-                    result += roundsign(data[0] - 1);
-                    result += roundsign(data[0] - 1);
-                }
-                return result;
-            });
-            test->SetPass("Performance Pos", [data](Parameter const* param)
-            {
-                int result = 0;
-                for (int i = 0, e = ((IntParameter const*)param)->GetValue(); i < e; ++i)
-                {
-                    result += roundsign(data[2] + 1);
-                    result += roundsign(data[2] + 1);
-                    result += roundsign(data[2] + 1);
-                }
-                return result;
-            });
-            suite->AddTest(move(test));
-        }
+        CreatePass("roundnaive", roundnaive);
+        CreatePass("roundopt", roundopt);
+        CreatePass("roundsign", roundsign);
+        CreatePass("roundsignbit", roundsignbit);
 
 		return unique_ptr<TestSuite const>(suite);
 	}
