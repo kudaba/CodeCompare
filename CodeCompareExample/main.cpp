@@ -27,6 +27,12 @@ int roundopt(float aFloat)
     return int(aFloat + 0.5f) * !neg + int(aFloat - 0.5f) * neg;
 }
 
+int roundbit(float aFloat)
+{
+    int neg = (*(int*)(&aFloat)) >> 31;
+    return int(aFloat + 0.5f) * !neg + int(aFloat - 0.5f) * neg;
+}
+
 int roundsign(float aFloat)
 {
     return int(aFloat + 0.5f * sign(aFloat));
@@ -72,6 +78,7 @@ class ExampleHarness : public TestHarness
         CreatePass("roundnaive", roundnaive);
         CreatePass("roundopt", roundopt);
         CreatePass("roundsign", roundsign);
+        CreatePass("roundbit", roundbit);
         CreatePass("roundsignbit", roundsignbit);
 
 		return unique_ptr<TestSuite const>(suite);
