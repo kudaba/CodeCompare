@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{4c4152c1-af2d-4394-be6e-01fab87f56bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Printers">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ChartJSWrapper.js">
+      <Filter>Printers</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Memory.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Time.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="ChartJSPrinter.cpp">
+      <Filter>Printers</Filter>
+    </ClCompile>
+    <ClCompile Include="TestSuite.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="Bootstrap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestSuite.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="TestResults.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="TestHarness.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="PrintHelpers.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ChartJSPrinter.h">
+      <Filter>Printers</Filter>
+    </ClInclude>
+    <ClInclude Include="Bootstrap.h" />
+  </ItemGroup>
+</Project>
