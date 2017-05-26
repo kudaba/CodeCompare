@@ -59,11 +59,20 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 
 				Memory::ResetThreadTracking();
 				Memory::Report membegin = Memory::GetThreadReport();
+
+
+                if (pass.second.Setup)
+                    pass.second.Setup(parameter.get());
+
 				__int64 begin = Time::GetCurrentTick();
 
-				result.CustomResult = pass.second(parameter.get());
+				result.CustomResult = pass.second.Function(parameter.get());
 
 				__int64 end = Time::GetCurrentTick();
+
+                if (pass.second.Teardown)
+                    pass.second.Teardown(parameter.get());
+
 				Memory::Report memend = Memory::GetThreadReport();
 
 				assert(memend.TotalMemory == membegin.TotalMemory);
@@ -107,7 +116,7 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 			if (passResults.second.Config[i].Sort == PassConfig::Ranked)
 			{
 				// convert from 0 to max ranking values
-				for (int paramIdx = 0; paramIdx < numParams; ++paramIdx)
+				for (size_t paramIdx = 0; paramIdx < numParams; ++paramIdx)
 				{
 					vector<__int64> sortedResults;
 					sortedResults.reserve(passResults.second.Results.size());

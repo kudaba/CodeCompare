@@ -60,19 +60,36 @@ class CodeTest : public NamedObject
 {
 public:
 	typedef function<__int64(Parameter const*)> PassCallback;
+    typedef function<void(Parameter const*)> PassSetup;
+
+    struct Pass
+    {
+        PassSetup Setup;
+        PassCallback Function;
+        PassSetup Teardown;
+    };
 
 	CodeTest(const char* name) : NamedObject(name)	{}
+    virtual ~CodeTest() {}
 
 	void SetPass(const char* name, PassCallback callback)
 	{
-		Passes[name] = callback;
+		Passes[name].Function = callback;
 	}
+    void SetPassSetup(const char* name, PassSetup callback)
+    {
+        Passes[name].Setup = callback;
+    }
+    void SetPassTeardown(const char* name, PassSetup callback)
+    {
+        Passes[name].Teardown = callback;
+    }
 
-	PassCallback const& GetPass(const char* name) const { return Passes.at(name); }
+    Pass const& GetPass(const char* name) const { return Passes.at(name); }
 	auto const& GetPasses() const { return Passes; }
 
 private:
-	map<string, PassCallback> Passes;
+	map<string, Pass> Passes;
 };
 
 //----------------------------------------------------------------------------------------
