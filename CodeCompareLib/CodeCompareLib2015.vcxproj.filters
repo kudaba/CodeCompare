@@ -34,6 +34,9 @@
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="Bootstrap.cpp" />
+    <ClCompile Include="File.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestSuite.h">
@@ -58,5 +61,8 @@
       <Filter>Printers</Filter>
     </ClInclude>
     <ClInclude Include="Bootstrap.h" />
+    <ClInclude Include="File.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

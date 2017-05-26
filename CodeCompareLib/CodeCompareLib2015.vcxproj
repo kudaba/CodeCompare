@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="ChartJSPrinter.cpp" />
     <ClCompile Include="Bootstrap.cpp" />
+    <ClCompile Include="File.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="TestSuite.cpp" />
     <ClCompile Include="Time.cpp" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="Bootstrap.h" />
     <ClInclude Include="ChartJSPrinter.h" />
+    <ClInclude Include="File.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="PrintHelpers.h" />
     <ClInclude Include="TestHarness.h" />
