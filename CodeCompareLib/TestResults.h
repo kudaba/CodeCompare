@@ -99,6 +99,7 @@ struct PassConfig
 		, ShowAverage(false)
 		, Sort(None)
 		, Reverse(false)
+        , Logarithmic(false)
 	{
 
 	}
@@ -111,6 +112,7 @@ struct PassConfig
 
 	Sorting Sort;
 	bool Reverse;
+    bool Logarithmic;
 };
 
 typedef TestInfo<__int64> TestResult;

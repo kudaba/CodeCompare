@@ -15,12 +15,16 @@ public:
 		, CSSFile(nullptr)
 		, ScriptStyle(ScriptStyleType::External)
 		, ScriptFile(nullptr)
-		, HTMLFile("results.html")
+        , Header(nullptr)
+        , Footer(nullptr)
+        , HTMLFile("results.html")
 		, IncludeD3(true)
-		, ChartWidth(500)
-		, ChartHeight(200)
-		, SpacingX(50)
-		, SpacingY(100)
+		, ChartWidth("500px")
+		, ChartHeight("500px")
+		, SpacingX("50px")
+		, SpacingY("100px")
+        , OneRowPerTest(true)
+        , ItemsPerRow(3)
 	{
 
 	}
@@ -46,16 +50,25 @@ public:
 	ScriptStyleType ScriptStyle;
 	const char* ScriptFile;
 
+    const char* Header;
+    const char* Footer;
+
 	const char* HTMLFile;
 
 	bool IncludeD3;
 
-	int ChartWidth;
-	int ChartHeight;
+    const char* ChartWidth;
+    const char* ChartHeight;
 
-	int SpacingX;
-	int SpacingY;
+    const char* SpacingX;
+    const char* SpacingY;
+
+    bool OneRowPerTest;
+    int ItemsPerRow; // only applies if OneRowPerTest is false
 
 	void PrintResults(TestResults const& results) const;
     void Open() const;
+
+protected:
+    mutable int ItemCount;
 };

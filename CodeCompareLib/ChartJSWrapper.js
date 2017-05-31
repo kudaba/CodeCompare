@@ -54,7 +54,12 @@ function CreateChart(chartConfig) {
     var options = {
         title: {
             text: chartConfig.test
-        }
+        },
+		scales: {
+			yAxes: [{
+				type: typeof(chartConfig.type) !== 'undefined' ? chartConfig.type : 'linear'
+			}]
+		}
     };
 
     var ctx = document.getElementById(chartConfig.id);
@@ -64,3 +69,4 @@ function CreateChart(chartConfig) {
         options: options
     });
 }
+

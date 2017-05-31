@@ -90,11 +90,10 @@ private:
 
 	void PrintChartStyle(fstream& file, char const* newLine) const
 	{
-		file << "float: left;" << newLine;
-		file << "width: " << ChartWidth << "px;" << newLine;
-		file << "height: " << ChartHeight << "px;" << newLine;
-		file << "margin-right: " << SpacingX << "px;" << newLine;
-		file << "margin-bottom: " << SpacingY << "px;" << newLine;
+        file << "width: " << ChartWidth << ";" << newLine;
+		file << "height: " << ChartHeight << ";" << newLine;
+		file << "margin-right: " << SpacingX << ";" << newLine;
+		file << "margin-bottom: " << SpacingY << ";" << newLine;
 	}
 
 	void PrintScript(fstream& file) const
@@ -114,52 +113,84 @@ private:
 
 	void PrintCharts(fstream& file, TestResults const& results) const
 	{
+        if (Header)
+        {
+            file.write(Header, strlen(Header));
+            file << endl;
+        }
+
 		PrintChartDivs(file, results);
 		PrintChartScripts(file, results);
-	}
+
+        if (Footer)
+        {
+            file.write(Footer, strlen(Footer));
+            file << endl;
+        }
+    }
 
 	void PrintChartDivs(fstream& file, TestResults const& results) const
 	{
-		PrintChartDivs(file, results.Summary, "Summary");
+        ItemCount = 0;
+
+        file << "\t<table>" << endl;
+        file << "\t\t<tr>" << endl;
+
+        PrintChartDivs(file, results.Summary, "Summary");
 
 		for (auto const& pass : results.Passes)
 		{
 			PrintChartDivs(file, pass.second, pass.first.c_str());
 		}
-	}
+
+        file << "\t\t</tr>" << endl;
+        file << "\t</table>" << endl;
+    }
+
+    void NextRow(fstream& file) const
+    {
+        file << "\t\t</tr>" << endl;
+        file << "\t\t<tr>" << endl;
+    }
 
 	void PrintChartDivs(fstream& file, TestResults::PassResults const& pass, const char* title) const
 	{
 		if (!pass.Config.Any([](auto const& e) {return e.Enabled; }))
 			return;
 
-		file << "\t<div>" << endl;
+        if (OneRowPerTest && ItemCount > 0)
+            NextRow(file);
 
 		for (int i = 0; i < TestConfig::Count; ++i)
 		{
 			if (pass.Config[i].Enabled)
 				PrintChartDiv(file, title, TestConfig::Name(i));
 		}
-
-		file << "\t</div>" << endl;
 	}
 
 	void PrintChartDiv(fstream& file, const char* title, const char* chart) const
 	{
+        if (!OneRowPerTest && (ItemCount % ItemsPerRow) == 0)
+            NextRow(file);
+
+        file << "\t\t\t<td>" << endl;
+
 		if (CSSStyle == CSSStyleType::Inline)
 		{
-			file << "\t\t<div style=\"";
+			file << "<div style=\"";
 			PrintChartStyle(file, "");
 			file << "\">" << endl;
 		}
 		else
 		{
-			file << "\t\t<div class=\"chart\">" << endl;
+			file << "<div class=\"chart\">" << endl;
 		}
 
 		file << "\t\t\t<canvas id=\"" << title << chart << "\" width=\"100\" height=\"100\"></canvas>" << endl;
-		file << "\t\t</div>" << endl;
-	}
+        file << "\t\t\t</div></td>" << endl;
+
+        ++ItemCount;
+    }
 
 
 	void PrintChartScripts(fstream& file, TestResults const& results) const
@@ -231,6 +262,14 @@ private:
 		file << "\ttest: \"" << title << ": " << chartName << "\"," << endl;
 		file << "\tid: \"" << title << chartName << "\"," << endl;
 		file << "\tparameters: " << parameters << "," << endl;
+
+        // options
+        if (pass.Config[index].Logarithmic && pass.Config[index].Sort == PassConfig::None)
+        {
+            file << "\ttype: 'logarithmic'," << endl;
+        }
+
+        // data
 		file << "\tpasses: [" << endl;
 
 		function<void(vector<TestResult> const&)> resultPrinter = [&](auto const& results) {
@@ -243,7 +282,8 @@ private:
 		}, nl);
 
 		file << endl << "\t]" << endl;
-		file << "});" << endl;
+
+        file << "});" << endl;
 	}
 
 	void PrintPassResults(fstream& file, const char* name, vector<TestResult> const& results, TestResults::PassResults const& pass, unsigned index) const
