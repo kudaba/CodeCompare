@@ -65,7 +65,7 @@ namespace File
         data.resize(bytes);
         file.read(data.data(), bytes);
 
-        if (file.gcount() < bytes)
+        if (file.gcount() >= 0 && (size_t)file.gcount() < bytes)
             data.resize((unsigned int)file.gcount());
         return data;
     }
