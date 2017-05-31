@@ -26,6 +26,7 @@ class ExampleHarness : public TestHarness
 	{
 		ChartJSPrinter printer;
 		printer.PrintResults(results);
+        printer.Open();
 	}
 };
 
