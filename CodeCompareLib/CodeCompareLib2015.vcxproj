@@ -73,23 +73,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)$(Platform)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
-    <IntDir>$(SolutionDir)\.build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <OutDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir).build\$(ProjectName)\$(Configuration)_$(Platform)\</IntDir>
+    <TargetName>$(ProjectName)_$(Configuration)$(Platform)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,7 +110,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)bin\"</Command>
+      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)\bin"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -125,7 +129,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)bin\"</Command>
+      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)\bin"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -151,7 +155,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)bin\"</Command>
+      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)\bin"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -174,7 +178,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)bin\"</Command>
+      <Command>xcopy /y "$(ProjectDir)ChartJSWrapper.js" "$(SolutionDir)\bin"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
