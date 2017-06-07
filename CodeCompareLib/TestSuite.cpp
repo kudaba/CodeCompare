@@ -57,12 +57,13 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 
 				TestResult result;
 
-				Memory::ResetThreadTracking();
-				Memory::Report membegin = Memory::GetThreadReport();
-
+                Memory::Report const presetup = Memory::GetThreadReport();
 
                 if (pass.second.Setup)
                     pass.second.Setup(parameter.get());
+
+                Memory::ResetThreadTracking();
+                Memory::Report const membegin = Memory::GetThreadReport();
 
 				__int64 begin = Time::GetCurrentTick();
 
@@ -70,13 +71,18 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 
 				__int64 end = Time::GetCurrentTick();
 
+				Memory::Report const memend = Memory::GetThreadReport();
+
                 if (pass.second.Teardown)
                     pass.second.Teardown(parameter.get());
 
-				Memory::Report memend = Memory::GetThreadReport();
+                Memory::Report const postteardown = Memory::GetThreadReport();
 
-				assert(memend.TotalMemory == membegin.TotalMemory);
-				assert(memend.ActiveAllocations == membegin.ActiveAllocations);
+				assert(membegin.TotalMemory == memend.TotalMemory);
+				assert(membegin.ActiveAllocations == memend.ActiveAllocations);
+
+                assert(presetup.TotalMemory == postteardown.TotalMemory);
+                assert(presetup.ActiveAllocations == postteardown.ActiveAllocations);
 
 				result.Performance = end - begin;
 				result.MemoryUsage = memend.TrackingMax;

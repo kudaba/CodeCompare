@@ -65,29 +65,55 @@ namespace Memory
 		Thread.ResetTracking();
 	}
 
-	void Alloc(size_t bytes)
+	void* Alloc(size_t bytes)
 	{
 		Global.Alloc(bytes);
 		Thread.Alloc(bytes);
+        return malloc(bytes);
 	}
 
-	void Free(size_t bytes)
+	void Free(void* p)
 	{
-		Global.Free(bytes);
-		Thread.Free(bytes);
+        if (p)
+        {
+            size_t bytes = _msize(p);
+            Global.Free(bytes);
+            Thread.Free(bytes);
+            free(p);
+        }
 	}
 }
 
-void * operator new(size_t n) throw()
+void * operator new(size_t bytes) throw()
 {
-	Memory::Alloc(n);
-	return malloc(n);
+	return Memory::Alloc(bytes);
 }
+void * operator new[](size_t bytes) throw()
+{
+    return Memory::Alloc(bytes);
+}
+void* operator new  (size_t bytes, const std::nothrow_t&)
+{
+    return Memory::Alloc(bytes);
+}
+void* operator new[](size_t bytes, const std::nothrow_t&)
+{
+    return Memory::Alloc(bytes);
+}
+
 void operator delete(void * p) throw()
 {
-    if (p)
-    {
-        Memory::Free(_msize(p));
-        free(p);
-    }
+    Memory::Free(p);
+}
+void operator delete[](void * p) throw()
+{
+    Memory::Free(p);
+}
+void operator delete(void * p, const std::nothrow_t&)
+{
+    Memory::Free(p);
+}
+void operator delete[](void * p, const std::nothrow_t&)
+{
+    Memory::Free(p);
 }
