@@ -85,6 +85,9 @@ void * operator new(size_t n) throw()
 }
 void operator delete(void * p) throw()
 {
-	Memory::Free(_msize(p));
-	free(p);
+    if (p)
+    {
+        Memory::Free(_msize(p));
+        free(p);
+    }
 }
