@@ -83,9 +83,9 @@ private:
 
 	void PrintCSS(fstream& file) const
 	{
-		file << "div.chart {" << endl;
+		file << "div.chart {" << "\n\t";
 		PrintChartStyle(file, "\n\t");
-		file << "}" << endl;
+		file << endl << "}" << endl;
 	}
 
 	void PrintChartStyle(fstream& file, char const* newLine) const
@@ -93,7 +93,7 @@ private:
         file << "width: " << ChartWidth << ";" << newLine;
 		file << "height: " << ChartHeight << ";" << newLine;
 		file << "margin-right: " << SpacingX << ";" << newLine;
-		file << "margin-bottom: " << SpacingY << ";" << newLine;
+		file << "margin-bottom: " << SpacingY << ";";
 	}
 
 	void PrintScript(fstream& file) const
@@ -177,16 +177,16 @@ private:
 
 		if (CSSStyle == CSSStyleType::Inline)
 		{
-			file << "<div style=\"";
+			file << "\t\t\t<div style=\"";
 			PrintChartStyle(file, "");
 			file << "\">" << endl;
 		}
 		else
 		{
-			file << "<div class=\"chart\">" << endl;
+			file << "\t\t\t<div class=\"chart\">" << endl;
 		}
 
-		file << "\t\t\t<canvas id=\"" << title << chart << "\" width=\"100\" height=\"100\"></canvas>" << endl;
+		file << "\t\t\t\t<canvas id=\"" << title << chart << "\" width=\"100\" height=\"100\"></canvas>" << endl;
         file << "\t\t\t</div></td>" << endl;
 
         ++ItemCount;
