@@ -29,6 +29,8 @@ public:
 	virtual ~Parameter() {}
 
 	virtual string ToString() const = 0;
+
+    virtual __int64 Max() const { return 1; }
 };
 
 //----------------------------------------------------------------------------------------

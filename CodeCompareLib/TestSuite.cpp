@@ -19,8 +19,8 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 	{
 		cout << "  Running Test: " << test->GetName() << endl;
 
-		auto& summary = testResults->Summary.Results[test->GetName()];
-		summary.Results.resize(numParams);
+		auto& summaries = testResults->Summary.Results[test->GetName()];
+        summaries.Results.resize(numParams);
 
 		for (auto const& pass : test->GetPasses())
 		{
@@ -86,21 +86,29 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 				TestResult& min = passResults.Min[paramIdx];
 				TestResult& max = passResults.Max[paramIdx];
 
+                TestResult& summary = summaries.Results[paramIdx];
+
 				for (unsigned i = 0; i < TestConfig::Count; ++i)
 				{
 					auto value = result[i];
-					summary.Results[paramIdx][i] += __int64(value*weight[i]);
+
+                    summary[i] += __int64(value*weight[i]);
+
 					sum[i] += value;
 					min[i] = value < min[i] ? value : min[i];
-					max[i] = value > max[i] ? value : max[i];
-				}
+
+                    if (passResults.Config[i].Sort != PassConfig::Percentage || i != TestConfig::Result)
+					    max[i] = value > max[i] ? value : max[i];
+                    else
+                        max[i] = parameter->Max();
+                }
 			}
 
 			cout << endl;
 		}
 
 		auto passCount = test->GetPasses().size();
-		for (auto& result : summary.Results)
+		for (auto& result : summaries.Results)
 		{
 			result.Performance /= passCount;
 			result.MemoryUsage /= passCount;

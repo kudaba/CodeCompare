@@ -269,6 +269,11 @@ private:
             file << "\ttype: 'logarithmic'," << endl;
         }
 
+        if (pass.Config[index].Sort == PassConfig::Percentage)
+        {
+            file << "\tmax: 1.0," << endl;
+        }
+
         // data
 		file << "\tpasses: [" << endl;
 
@@ -306,7 +311,8 @@ private:
 		{
 		case PassConfig::RelativeValue1Min:
 		case PassConfig::RelativeValue1Max:
-		{
+        case PassConfig::Percentage:
+        {
 			int paramIdx = 0;
 			float sum = 0;
 			PrintList(results, file, [&](auto const& r)

@@ -57,7 +57,8 @@ function CreateChart(chartConfig) {
         },
 		scales: {
 			yAxes: [{
-				type: typeof(chartConfig.type) !== 'undefined' ? chartConfig.type : 'linear'
+				type: typeof(chartConfig.type) !== 'undefined' ? chartConfig.type : 'linear',
+				max: chartConfig.max
 			}]
 		}
     };

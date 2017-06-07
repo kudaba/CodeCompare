@@ -20,7 +20,10 @@ struct TestInfo
 {
 	enum
 	{
-		Count = 3
+        Result = 0,
+        Perf,
+        Memory,
+		Count
 	};
 
 	TestInfo()
@@ -90,6 +93,7 @@ struct PassConfig
 		RelativeValue1Max,		// Show value relative to maximum value
 		RelativeValue1Min,		// Show value relative to minimum value
 		Ranked,					// Show by rank (lowest = 1, next is 2, etc)
+        Percentage,             // Show by percentage parameter max value
 	};
 
 
