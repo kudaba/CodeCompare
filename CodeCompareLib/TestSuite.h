@@ -103,7 +103,13 @@ private:
 class TestSuite : public NamedObject
 {
 public:
-	TestSuite(const char* name) : NamedObject(name) {}
+	TestSuite(const char* name)
+        : NamedObject(name)
+        , SummaryConfig(PassConfig(1), PassConfig(0), PassConfig(0))
+    {
+        SummaryConfig[0].Sort = PassConfig::RelativeValue1Max;
+        SummaryConfig[0].ShowAverage = true;
+    }
 
 	static unique_ptr<Parameter const> MakeParameter(unique_ptr<Parameter const> parameter)
 	{
@@ -157,6 +163,9 @@ public:
 	unique_ptr<TestResults> RunTests() const;
 
 private:
+    void ProcessSummary(TestResults* testResults) const;
+    void SortByRank(TestResults* testResults) const;
+
 	vector<unique_ptr<CodeTest const>> Tests;
 	vector<unique_ptr<Parameter const>> Parameters;
 	map<string, TestWeight> PassWeights;

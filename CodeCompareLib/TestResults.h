@@ -69,6 +69,11 @@ struct TestInfo
 	T const* begin() const { return (T const*)this; }
 	T const* end() const { return ((T const*)this) + Count; }
 
+    TestInfo operator-(TestInfo other) const
+    {
+        return TestInfo(CustomResult - other.CustomResult, Performance - other.Performance, MemoryUsage - other.MemoryUsage);
+    }
+
 	static const char* Name(unsigned i)
 	{
 		const char* names[] =
@@ -144,7 +149,8 @@ struct TestResults
 
 		vector<TestResult> Min;
 		vector<TestResult> Max;
-	};
+        vector<TestResult> Reference;
+    };
 
 	map<string, PassResults> Passes;
 

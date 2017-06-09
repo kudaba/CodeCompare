@@ -317,7 +317,10 @@ private:
 			float sum = 0;
 			PrintList(results, file, [&](auto const& r)
 			{
-				__int64 div = sort == PassConfig::RelativeValue1Min ? pass.Min[paramIdx][index] : pass.Max[paramIdx][index];
+				__int64 div =
+                    sort == PassConfig::RelativeValue1Min ? pass.Min[paramIdx][index] :
+                    sort == PassConfig::RelativeValue1Max ? pass.Max[paramIdx][index] :
+                    pass.Reference[paramIdx][index];
 
 				float val = div == 0 ? 1.0f : float(double(r[index]) / double(div));
 				sum += val;
