@@ -50,6 +50,7 @@ private:
 };
 
 typedef BasicParameter<int> IntParameter;
+typedef BasicParameter<long long> Int64Parameter;
 typedef BasicParameter<float> FloatParameter;
 
 //----------------------------------------------------------------------------------------
