@@ -161,6 +161,11 @@ public:
 		SummaryConfig = config;
 	}
 
+	void DisableSummary()
+	{
+		SummaryConfig = TestConfig(0);
+	}
+
 	unique_ptr<TestResults> RunTests() const;
 
 private:
