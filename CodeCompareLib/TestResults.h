@@ -102,8 +102,9 @@ struct PassConfig
 	};
 
 
-	PassConfig(int init)
-		: Enabled(!!init)
+	PassConfig(int iterations)
+		: Iterations(iterations)
+		, Enabled(iterations > 0)
 		, ShowSum(false)
 		, ShowAverage(false)
 		, Sort(None)
@@ -113,9 +114,10 @@ struct PassConfig
 
 	}
 
-	bool Enabled;				// enable this pass at all
+	int Iterations;				// 0 = disabled enable this pass at all
+	bool Enabled;
 
-	// Extra paramters
+	// Extra parameters
 	bool ShowSum;				// Show a sum of all parameters used
 	bool ShowAverage;			// Show the average all parameters used
 

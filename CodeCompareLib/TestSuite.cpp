@@ -36,6 +36,9 @@ unique_ptr<TestResults> TestSuite::RunTests() const
 
             bool first = true;
 
+			int iterations = 1;
+			passResults.Config.Any([&](PassConfig const& config) { iterations = max(iterations, config.Iterations); return false; });
+
             for (size_t paramIdx = 0; paramIdx < numParams; ++paramIdx)
             {
                 auto const& parameter = Parameters[paramIdx];
@@ -46,53 +49,70 @@ unique_ptr<TestResults> TestSuite::RunTests() const
                 cout << parameter->ToString();
                 first = false;
 
-                TestResult result;
+				TestResult result;
+				
+				for (size_t iteration = 0; iteration < iterations; ++iteration)
+				{
+					Memory::Report const presetup = Memory::GetThreadReport();
 
-                Memory::Report const presetup = Memory::GetThreadReport();
+					if (pass.second.Setup)
+						pass.second.Setup(parameter.get());
 
-                if (pass.second.Setup)
-                    pass.second.Setup(parameter.get());
+					Memory::ResetThreadTracking();
+					Memory::Report const membegin = Memory::GetThreadReport();
 
-                Memory::ResetThreadTracking();
-                Memory::Report const membegin = Memory::GetThreadReport();
+					__int64 begin = Time::GetCurrentTick();
 
-                __int64 begin = Time::GetCurrentTick();
+					__int64 custom = pass.second.Function(parameter.get());
 
-                result.CustomResult = pass.second.Function(parameter.get());
+					__int64 end = Time::GetCurrentTick();
 
-                __int64 end = Time::GetCurrentTick();
+					Memory::Report const memend = Memory::GetThreadReport();
 
-                Memory::Report const memend = Memory::GetThreadReport();
+					if (pass.second.Teardown)
+						pass.second.Teardown(parameter.get());
 
-                if (pass.second.Teardown)
-                    pass.second.Teardown(parameter.get());
+					Memory::Report const postteardown = Memory::GetThreadReport();
 
-                Memory::Report const postteardown = Memory::GetThreadReport();
+					assert(membegin.TotalMemory == memend.TotalMemory);
+					assert(membegin.ActiveAllocations == memend.ActiveAllocations);
 
-                assert(membegin.TotalMemory == memend.TotalMemory);
-                assert(membegin.ActiveAllocations == memend.ActiveAllocations);
+					assert(presetup.TotalMemory == postteardown.TotalMemory);
+					assert(presetup.ActiveAllocations == postteardown.ActiveAllocations);
 
-                assert(presetup.TotalMemory == postteardown.TotalMemory);
-                assert(presetup.ActiveAllocations == postteardown.ActiveAllocations);
+					__int64 perf = end - begin;
+					__int64 mem = memend.TrackingMax;
 
-                result.Performance = end - begin;
-                result.MemoryUsage = memend.TrackingMax;
+					if (iteration == 0)
+					{
+						result.CustomResult = custom;
+						result.Performance = perf;
+						result.MemoryUsage = mem;
+					}
+					else
+					{
+						assert(result.CustomResult == custom);
+						assert(result.MemoryUsage == mem);
 
-                results.Results.push_back(std::move(result));
+						result.Performance = min(result.Performance, perf);
+					}
+				}
 
-                TestResult& min = passResults.Min[paramIdx];
-                TestResult& max = passResults.Max[paramIdx];
-                TestResult& ref = passResults.Reference[paramIdx];
-                ref.CustomResult = parameter->Max();
+				results.Results.push_back(std::move(result));
 
-                for (unsigned i = 0; i < TestConfig::Count; ++i)
-                {
-                    auto value = result[i];
+				TestResult& min = passResults.Min[paramIdx];
+				TestResult& max = passResults.Max[paramIdx];
+				TestResult& ref = passResults.Reference[paramIdx];
+				ref.CustomResult = parameter->Max();
 
-                    min[i] = value < min[i] ? value : min[i];
-                    max[i] = value > max[i] ? value : max[i];
-                }
-            }
+				for (unsigned i = 0; i < TestConfig::Count; ++i)
+				{
+					auto value = result[i];
+
+					min[i] = value < min[i] ? value : min[i];
+					max[i] = value > max[i] ? value : max[i];
+				}
+			}
 
             cout << endl;
         }
