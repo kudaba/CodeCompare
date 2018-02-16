@@ -18,6 +18,7 @@ public:
         , Header(nullptr)
         , Footer(nullptr)
         , HTMLFile("results.html")
+		, OutputPath(nullptr)
 		, IncludeD3(true)
 		, ChartWidth("500px")
 		, ChartHeight("500px")
@@ -54,6 +55,7 @@ public:
     const char* Footer;
 
 	const char* HTMLFile;
+	const char* OutputPath;
 
 	bool IncludeD3;
 

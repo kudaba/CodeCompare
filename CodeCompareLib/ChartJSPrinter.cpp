@@ -11,7 +11,7 @@ class ChartJSPrinterInternal : public ChartJSPrinter
 public:
 	void PrintResultsInternal(TestResults const& results) const
 	{
-		fstream file(HTMLFile, fstream::out);
+		fstream file(GetOutputFile(HTMLFile), fstream::out);
 
 		if (FullHtml)
 		{
@@ -25,6 +25,35 @@ public:
 			PrintCharts(file, results);
 		}
 	}
+
+	string GetReferenceFile(char const* fileName, const char* extension) const
+	{
+		string referenceFile;
+		if (fileName)
+		{
+			referenceFile += fileName;
+		}
+		else
+		{
+			referenceFile += HTMLFile;
+			if (extension)
+				referenceFile += extension;
+		}
+		return move(referenceFile);
+	}
+
+	string GetOutputFile(char const* fileName) const
+	{
+		string outputFile;
+		if (OutputPath)
+		{
+			outputFile = OutputPath;
+			outputFile += "\\";
+		}
+		outputFile += fileName;
+		return move(outputFile);
+	}
+
 private:
 	void PrintFullHtml(fstream& file, TestResults const& results) const
 	{
@@ -44,14 +73,11 @@ private:
 	{
 		if (CSSStyle == CSSStyleType::External)
 		{
-			string cssfileName = CSSFile ? CSSFile : HTMLFile;
-			if (!CSSFile)
-				cssfileName += ".css";
-
-			fstream cssFile(cssfileName, fstream::out);
+			string cssFileName = GetReferenceFile(CSSFile, ".css");
+			fstream cssFile(GetOutputFile(cssFileName.c_str()), fstream::out);
 			PrintCSS(cssFile);
 
-			file << "<link rel=\"stylesheet\" type=\"text/css\" href=\"" << cssfileName.c_str() << "\"></script>" << endl;
+			file << "<link rel=\"stylesheet\" type=\"text/css\" href=\"" << cssFileName.c_str() << "\"></script>" << endl;
 		}
 		else if (CSSStyle == CSSStyleType::Internal)
 		{
@@ -64,11 +90,8 @@ private:
 
 		if (ScriptStyle == ScriptStyleType::External)
 		{
-			string scriptFileName = ScriptFile ? ScriptFile : HTMLFile;
-			if (!ScriptFile)
-				scriptFileName += ".js";
-
-			fstream scriptFile(scriptFileName, fstream::out);
+			string scriptFileName = GetReferenceFile(ScriptFile, ".js");
+			fstream scriptFile(GetOutputFile(scriptFileName.c_str()), fstream::out);
 			PrintScript(scriptFile);
 
 			file << "<script src=\"" << scriptFileName.c_str() << "\"></script>" << endl;
@@ -96,19 +119,35 @@ private:
 		file << "margin-bottom: " << SpacingY << ";";
 	}
 
-	void PrintScript(fstream& file) const
+	void CopyFile(fstream& source, fstream& dest) const
 	{
-		fstream scriptSourceFile("ChartJSWrapper.js", fstream::in);
-		scriptSourceFile.seekg(0, scriptSourceFile.end);
-		auto length = scriptSourceFile.tellg();
-		scriptSourceFile.seekg(0, scriptSourceFile.beg);
+		source.seekg(0, source.end);
+		auto length = source.tellg();
+		source.seekg(0, source.beg);
 
 		char* data = new char[(size_t)length.seekpos()];
-		scriptSourceFile.read(data, length);
-		file.write(data, scriptSourceFile.gcount());
-		file << endl;
+		source.read(data, length);
+		dest.write(data, source.gcount());
+		dest << endl;
 
 		delete[] data;
+	}
+
+	void PrintScript(fstream& file) const
+	{
+		string scriptFile = GetOutputFile("ChartJSWrapper.js");
+
+		// walk up dir tree for file (todo: actually limit based on current dir depth)
+		for (int i = 0; i < 5; ++i)
+		{
+			fstream scriptSourceFile(scriptFile, fstream::in);
+			if (!errno)
+			{
+				CopyFile(scriptSourceFile, file);
+				return;
+			}
+			scriptFile = string("../") + scriptFile;
+		}
 	}
 
 	void PrintCharts(fstream& file, TestResults const& results) const
@@ -356,5 +395,7 @@ void ChartJSPrinter::PrintResults(TestResults const& results) const
 
 void ChartJSPrinter::Open() const
 {
-    system(HTMLFile);
+	auto internal = (ChartJSPrinterInternal const*)this;
+	string htmlFile = internal->GetOutputFile(HTMLFile);
+	system(htmlFile.c_str());
 }
